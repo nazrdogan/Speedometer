@@ -1,25 +1,47 @@
-//
-//  ViewController.swift
-//  Speedometer
-//
-//  Created by Nazir Dogan on 28/08/16.
-//  Copyright © 2016 Nazir Dogan. All rights reserved.
-//
-
 import UIKit
+import Foundation
+import CoreLocation
 
-class ViewController: UIViewController {
-
+class ViewController: UIViewController, CLLocationManagerDelegate {
+    
+    let manager = CLLocationManager()
+    var currentSpeed = 0.0
+    
+    
+    @IBOutlet weak var myLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        myLabel.text = String(currentSpeed)
+        manager.requestWhenInUseAuthorization()
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.startUpdatingLocation()
+        print("Location watching started")
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        var  mySpeed = manager.location!.speed*3.6
+        if (mySpeed) <= 0 {
+            mySpeed = 0.0
+        }
+       
+        myLabel.text = String(mySpeed.truncate(1))
+        
     }
+    
+    func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
+        print("Error: \(error.localizedDescription)")
+}
+    
+    
+}
 
-
+extension Double
+{
+    func truncate(places : Int)-> Double
+    {
+        return Double(floor(pow(10.0, Double(places)) * self)/pow(10.0, Double(places)))
+    }
 }
 
